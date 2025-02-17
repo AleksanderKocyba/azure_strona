@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Salon Kosmetyczny</title>
+</head>
+<body>
+    <h1>Rezerwacje</h1>
+    <input type="text" id="filter" placeholder="Filtruj po imieniu">
+    <button onclick="fetchReservations()">Pobierz rezerwacje</button>
+    <table border="1">
+        <thead>
+            <tr><th>ID</th><th>Imię</th><th>Data</th></tr>
+        </thead>
+        <tbody id="reservations"></tbody>
+    </table>
+
+    <h2>Dodaj rezerwację</h2>
+    <input type="text" id="name" placeholder="Imię">
+    <input type="date" id="date">
+    <button onclick="addReservation()">Dodaj</button>
+
+    <script>
+        function fetchReservations() {
+            fetch('http://localhost:5000/rezerwacje')
+                .then(response => response.json())
+                .then(data => {
+                    const filter = document.getElementById('filter').value.toLowerCase();
+                    const tbody = document.getElementById('reservations');
+                    tbody.innerHTML = '';
+                    data.filter(r => r.Imie.toLowerCase().includes(filter)).forEach(r => {
+                        tbody.innerHTML += `<tr><td>${r.Id}</td><td>${r.Imie}</td><td>${r.Data}</td></tr>`;
+                    });
+                });
+        }
+
+        function addReservation() {
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            fetch('http://localhost:5000/rezerwacje', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Imie: name, Data: date })
+            }).then(() => fetchReservations());
+        }
+    </script>
+</body>
+</html>
